@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bosh sahifa</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: white; /* Orqa fon oq rang */
+            color: black; /* Matnlar qora rang */
+            font-family: Arial, sans-serif;
+        }
+        .welcome-message {
+            animation: fadeIn 1s ease-in-out;
+            margin-top: 50px;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .btn-custom {
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 5px;
+            transition: transform 0.2s, background-color 0.3s;
+        }
+        .btn-primary {
+            background-color: #007bff;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        .btn-custom:hover {
+            transform: scale(1.1);
+            background-color: #0056b3;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .btn-custom {
+            width: 200px; /* Set a fixed width for all buttons */
+            padding: 15px 0; /* Adjust padding for uniformity */
+            font-size: 18px; /* Ensure font size is consistent */
+            border-radius: 5px; /* Rounded corners */
+            transition: transform 0.2s, background-color 0.3s;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        .btn-custom:hover {
+            transform: scale(1.1);
+            background-color: #c82333;
+        }
+        .header-image {
+            position: absolute;
+            top: 30px;
+            left: 40px;
+            width: 200px; /* Rasmning kattaligini o'zgartiring */
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+<div class="container text-center">
+    <!-- Rasmni joylashtirish r.b-->
+    <img src="/media/i.jpg" alt="i" class="header-image">
+    {% if user.is_authenticated %}
+    <div class="welcome-message">
+
+        <br>
+        <br>
+        <a href="{% url 'check_ips' %}" class="btn btn-danger btn-custom">IP </a>
+        <br>
+        <br>
+        <!-- <a href="{% url 'camera' %}" class="btn btn-danger btn-custom">Camera</a> -->
+        <!-- <br> -->
+        <!-- <br> -->
+        <a href="{% url 'userlist' %}" class="btn btn-danger btn-custom">Foydalanuvchilar</a>
+        <br>
+        <br>
+        <a href="{% url 'register' %}" class="btn btn-danger btn-custom">Admin Qo'shish</a>
+        <br>
+        <br>
+        <a href="{% url 'login' %}" class="btn btn-danger btn-custom">Chiqish</a>
+    </div>
+    {% else %}
+    <div class="welcome-message">
+        <p class="lead">Iltimos, tizimga kirishingiz yoki ro'yxatdan o'tishingiz kerak.</p>
+        <a href="{% url 'login' %}" class="btn btn-primary btn-custom">Kirish</a>
+        <!-- <a href="{% url 'register' %}" class="btn btn-success btn-custom">Ro'yxatdan o'tish</a> -->
+    </div>
+    {% endif %}
+</div>
+<!-- Bootstrap JS (optional) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

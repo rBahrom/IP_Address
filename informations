@@ -1,0 +1,33 @@
+1.Bu buyruq requirements.txt faylida keltirilgan barcha paketlarni offline_packages papkasiga yuklab oladi.
+pip download -r requirements.txt -d ./offline_packages
+
+2.offline_packages papkasidagi barcha paketlarni o'rnating. Buning uchun quyidagi buyruqdan foydalaning:
+pip install --no-index --find-links=./offline_packages -r requirements.txt
+
+3. Loyihani Portable Qilish (Ixtiyoriy)
+Agar loyihangizni USB fleshka orqali ko'chirib yurishni xohlasangiz, quyidagi yondashuvlardan foydalanishingiz mumkin:
+
+a) Python Portable Versiyasini Ishlatish
+Python ning portable versiyasini USB fleshkaga o'rnating va loyihangizni shu yerdan ishga tushiring.
+
+b) Loyihani Bitta Faylga Birlashtirish
+Loyihangizni bitta faylga birlashtirish uchun PyInstaller kabi vositalardan foydalaning. Misol uchun:
+PyInstaller ni o'rnating:
+pip install pyinstaller
+
+Loyihani bitta faylga birlashtiring:
+pyinstaller --onefile manage.py
+
+Hosil bo'lgan faylni USB fleshkaga nusxalang.
+
+\\\\
+1. Loyihani Ishga Tushirish
+Terminalda loyiha papkasiga o'ting:
+cd /path/to/your/project
+
+Loyihani ishga tushiring. Misol uchun:
+Agar loyihangiz manage.py orqali ishga tushadigan bo'lsa:
+python manage.py runserver
+
+Agar loyihangiz boshqa fayl orqali ishga tushadigan bo'lsa:
+python your_script.py

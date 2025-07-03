@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Natijalar</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            border-radius: 10px 10px 0 0;
+            text-align: center;
+            padding: 15px 0;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            margin-bottom: 10px;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .status-online { color: #28a745; }
+        .status-offline { color: #dc3545; }
+        .status-error { color: #ffc107; }
+        table {
+            background-color: #ffffff;
+        }
+        th, td {
+            color: #343a40;
+            text-align: center;
+        }
+        .badge {
+            font-size: 0.9rem;
+        }
+        .hidden {
+            display: none;
+        }
+        .img-fluid {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .text-muted {
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title">IP Natijalari</h1>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-row justify-content-start">
+                    <div class="flex-fill me-2">
+                        <a href="{% url 'check_ips' %}" class="btn btn-success w-100">Boshqa fayl yuklash</a>
+                    </div>
+                    <div class="flex-fill me-2">
+                        <a href="{% url 'home' %}" class="btn btn-info w-100">Bosh sahifa</a>
+                    </div>
+                    <div class="flex-fill me-2">
+                        <a href="{% url 'archive' %}" class="btn btn-warning w-100">Arxivni ko'rish</a>
+                    </div>
+                </div>
+
+                <div class="text-center my-4">
+                    <p>Jami online IP manzillar: <span class="status-online">{{ online_count }}</span></p>
+                    <p>Jami offline IP manzillar: <span class="status-offline">{{ offline_count }}</span></p>
+                </div>
+
+                <!-- Filter buttons -->
+                <div class="text-center my-4 d-flex justify-content-center gap-2">
+                    <button id="showAllButton" class="btn btn-primary flex-fill">Hammasi</button>
+                    <button id="showOnlineButton" class="btn btn-success flex-fill">Online</button>
+                    <button id="showOfflineButton" class="btn btn-danger flex-fill">Offline</button>
+                </div>
+
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Indeks</th>
+                            <th>IP</th>
+                            {% for i in results.0.keys %}
+                                {% if i != 'index' and i != 'IP' and i != 'Status' %}
+                                    <th>{{ i }}</th>
+                                {% endif %}
+                            {% endfor %}
+                            <th>Status</th>
+                            <th>Camera</th> <!-- Yangi ustun -->
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTable">
+                        {% for result in results %}
+                        <tr class="result-row" data-status="{{ result.Status|lower }}">
+                            <td>{{ result.index }}</td>
+                            <td>{{ result.IP }}</td>
+                            {% for key, value in result.items %}
+                                {% if key != 'index' and key != 'IP' and key != 'Status' %}
+                                    <td>{{ value }}</td>
+                                {% endif %}
+                            {% endfor %}
+                            <td>
+                                <span class="badge rounded-pill {% if result.Status == 'online' %}bg-success{% elif result.Status == 'offline' %}bg-danger{% else %}bg-warning{% endif %}">
+                                    {{ result.Status }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if result.Status == 'online' or result.Status == 'offline' %}
+                                    <button class="btn btn-sm btn-info" onclick="toggleDetails('details{{ result.index }}')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" height="1em" fill="currentColor" viewBox="0 0 512 512">
+                                          <path
+                                            d="M 56.888888888888886 128 Q 43.55555555555556 128.88888888888889 42.666666666666664 142.22222222222223 L 42.666666666666664 369.77777777777777 L 42.666666666666664 369.77777777777777 Q 43.55555555555556 383.1111111111111 56.888888888888886 384 L 284.44444444444446 384 L 284.44444444444446 384 Q 297.77777777777777 383.1111111111111 298.6666666666667 369.77777777777777 L 298.6666666666667 142.22222222222223 L 298.6666666666667 142.22222222222223 Q 297.77777777777777 128.88888888888889 284.44444444444446 128 L 56.888888888888886 128 L 56.888888888888886 128 Z M 0 142.22222222222223 Q 0.8888888888888888 118.22222222222223 16.88888888888889 102.22222222222223 L 16.88888888888889 102.22222222222223 L 16.88888888888889 102.22222222222223 Q 32.888888888888886 86.22222222222223 56.888888888888886 85.33333333333333 L 284.44444444444446 85.33333333333333 L 284.44444444444446 85.33333333333333 Q 308.44444444444446 86.22222222222223 324.44444444444446 102.22222222222223 Q 340.44444444444446 118.22222222222223 341.3333333333333 142.22222222222223 L 341.3333333333333 171.55555555555554 L 341.3333333333333 171.55555555555554 L 341.3333333333333 340.44444444444446 L 341.3333333333333 340.44444444444446 L 341.3333333333333 369.77777777777777 L 341.3333333333333 369.77777777777777 Q 340.44444444444446 393.77777777777777 324.44444444444446 409.77777777777777 Q 308.44444444444446 425.77777777777777 284.44444444444446 426.6666666666667 L 56.888888888888886 426.6666666666667 L 56.888888888888886 426.6666666666667 Q 32.888888888888886 425.77777777777777 16.88888888888889 409.77777777777777 Q 0.8888888888888888 393.77777777777777 0 369.77777777777777 L 0 142.22222222222223 L 0 142.22222222222223 Z M 469.3333333333333 351.1111111111111 L 469.3333333333333 160.88888888888889 L 469.3333333333333 351.1111111111111 L 469.3333333333333 160.88888888888889 L 369.77777777777777 205.33333333333334 L 369.77777777777777 205.33333333333334 L 369.77777777777777 158.22222222222223 L 369.77777777777777 158.22222222222223 L 462.22222222222223 117.33333333333333 L 462.22222222222223 117.33333333333333 Q 469.3333333333333 113.77777777777777 477.3333333333333 113.77777777777777 Q 491.55555555555554 113.77777777777777 501.3333333333333 124.44444444444444 Q 512 134.22222222222223 512 149.33333333333334 L 512 363.55555555555554 L 512 363.55555555555554 Q 512 377.77777777777777 501.3333333333333 387.55555555555554 Q 491.55555555555554 398.22222222222223 477.3333333333333 398.22222222222223 Q 469.3333333333333 398.22222222222223 462.22222222222223 395.55555555555554 L 369.77777777777777 353.77777777777777 L 369.77777777777777 353.77777777777777 L 369.77777777777777 306.6666666666667 L 369.77777777777777 306.6666666666667 L 469.3333333333333 351.1111111111111 L 469.3333333333333 351.1111111111111 Z"
+                                          />
+                                        </svg>
+                                </button>
+                                {% else %}
+                                    <span class="text-muted"> </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <!-- Pagination -->
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1" aria-label="Birinchi">
+                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Oldingi">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Keyingi">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Oxirgi">
+                                    <span aria-hidden="true">&raquo;&raquo;</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const showAllButton = document.getElementById('showAllButton');
+            const showOnlineButton = document.getElementById('showOnlineButton');
+            const showOfflineButton = document.getElementById('showOfflineButton');
+            const resultRows = document.querySelectorAll('.result-row');
+
+            // Hammasini ko'rsatish
+            showAllButton.addEventListener('click', function () {
+                resultRows.forEach(row => row.classList.remove('hidden'));
+            });
+
+            // Faqat Onlinelarni ko'rsatish
+            showOnlineButton.addEventListener('click', function () {
+                resultRows.forEach(row => {
+                    if (row.getAttribute('data-status') === 'online') {
+                        row.classList.remove('hidden');
+                    } else {
+                        row.classList.add('hidden');
+                    }
+                });
+            });
+
+            // Faqat Offlinelarni ko'rsatish
+            showOfflineButton.addEventListener('click', function () {
+                resultRows.forEach(row => {
+                    if (row.getAttribute('data-status') === 'offline') {
+                        row.classList.remove('hidden');
+                    } else {
+                        row.classList.add('hidden');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
